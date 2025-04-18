@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ORGANIZER
+}
+
+enum TransactionStatus {
+  WAITING_PAYMENT
+  WAITING_CONFIRMATION
+  DONE
+  REJECTED
+  EXPIRED
+  CANCELED
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String           @unique
+  password        String
+  role            Role             @default(CUSTOMER)
+  profileImage    String?
+  referralCode    String?          @unique
+  referredBy      String?
+  points          Int              @default(0)
+  createdAt       DateTime         @default(now())
+  events          Event[]          @relation("OrganizerEvents")
+  transactions    Transaction[]
+  reviews         Review[]
+  referralRewards ReferralReward[]
+  userVouchers    UserVoucher[]
+}
+
+model Event {
+  id             Int           @id @default(autoincrement())
+  title          String
+  description    String
+  category       String
+  location       String
+  startDate      DateTime
+  endDate        DateTime
+  price          Int
+  imageUrl       String
+  availableSeats Int
+  createdAt      DateTime      @default(now())
+  organizerId    Int
+  organizer      User          @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  ticketTypes    TicketType[]
+  transactions   Transaction[]
+  reviews        Review[]
+  vouchers       Voucher[]
+}
+
+model TicketType {
+  id            Int           @id @default(autoincrement())
+  name          String
+  price         Int
+  totalQuantity Int
+  availableQty  Int
+  eventId       Int
+  event         Event         @relation(fields: [eventId], references: [id])
+  transactions  Transaction[]
+}
+
+model Transaction {
+  id           Int               @id @default(autoincrement())
+  userId       Int
+  user         User              @relation(fields: [userId], references: [id])
+  eventId      Int
+  event        Event             @relation(fields: [eventId], references: [id])
+  ticketTypeId Int
+  ticketType   TicketType        @relation(fields: [ticketTypeId], references: [id])
+  quantity     Int
+  totalPrice   Int
+  paymentProof String?
+  status       TransactionStatus
+  pointsUsed   Int               @default(0)
+  voucherCode  String?
+  expiresAt    DateTime
+  createdAt    DateTime          @default(now())
+}
+
+model Voucher {
+  code         String        @id
+  discount     Int
+  startDate    DateTime
+  endDate      DateTime
+  eventId      Int
+  event        Event         @relation(fields: [eventId], references: [id])
+  userVouchers UserVoucher[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+}
+
+model ReferralReward {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  points    Int      @default(10000)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model UserVoucher {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  voucherId String
+  voucher   Voucher  @relation(fields: [voucherId], references: [code])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
