@@ -1,9 +1,40 @@
 import { prisma } from "../prisma/client";
 import { UserInput } from "../models/interface";
+import { generateReferralCode } from "../lib/utils/generateReferralCode";
+import { ReferralService } from "./refferal.service";
 
+const referralService = new ReferralService();
 export class UserService {
   public async create(data: UserInput) {
-    return await prisma.user.create({ data });
+    // generate referral code
+    let referralCode = "";
+    let isUnique = false;
+
+    while (!isUnique) {
+      referralCode = generateReferralCode(data.name);
+      const existing = await prisma.user.findUnique({
+        where: { referralCode },
+      });
+      if (!existing) isUnique = true;
+    }
+
+    // create user dulu
+    const newUser = await prisma.user.create({
+      data: {
+        ...data,
+        referralCode,
+      },
+    });
+
+    // jalankan logic referral
+    await referralService.handleReferral(newUser, data.referredBy);
+
+    // fetch ulang user untuk ambil data terbaru (termasuk referredBy yang sudah diupdate)
+    const finalUser = await prisma.user.findUnique({
+      where: { id: newUser.id },
+    });
+
+    return finalUser;
   }
   public async update(id: number, data: Partial<UserInput>) {
     return prisma.user.update({
