@@ -44,7 +44,7 @@ model User {
   referralRewards ReferralReward[]
   userVouchers    UserVoucher[]
 
-  updatedAt DateTime? @updatedAt
+  updatedAt DateTime  @updatedAt
   deleteAt  DateTime?
 }
 
@@ -67,7 +67,7 @@ model Event {
   reviews        Review[]
   vouchers       Voucher[]
 
-  updatedAt DateTime? @updatedAt
+  updatedAt DateTime  @updatedAt
   deleteAt  DateTime?
 }
 
@@ -98,7 +98,7 @@ model Transaction {
   voucherCode  String?
   expiresAt    DateTime
   createdAt    DateTime          @default(now())
-  updatedAt    DateTime?         @updatedAt
+  updatedAt    DateTime          @updatedAt
   deleteAt     DateTime?
 }
 
@@ -121,7 +121,7 @@ model Review {
   user      User      @relation(fields: [userId], references: [id])
   eventId   Int
   event     Event     @relation(fields: [eventId], references: [id])
-  updatedAt DateTime? @updatedAt
+  updatedAt DateTime  @updatedAt
   deleteAt  DateTime?
 }
 
