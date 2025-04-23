@@ -11,14 +11,29 @@ export interface UserPayLoad {
   role: "CUSTOMER" | "ORGANIZER";
 }
 
+export interface EventQuery {
+  search?: string;
+  category?: string;
+  location?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface TicketTypeInput {
+  name: string;
+  price: number;
+  totalQuantity: number;
+}
+
 export interface EventInput {
   title: string;
   description: string;
   category: string;
   location: string;
-  startDate: string; // ISO date string, misalnya: "2025-05-15T18:00:00.000Z"
+  startDate: string; // ISO date string
   endDate: string; // ISO date string
   price: number;
   imageUrl: string;
   availableSeats: number;
+  ticketTypes: TicketTypeInput[];
 }
