@@ -72,4 +72,16 @@ export class EventService {
       total,
     };
   }
+
+  public async update(id: number, data: Partial<EventInput>) {
+    const { ticketTypes, ...eventData } = data;
+
+    return await prisma.event.update({
+      where: { id },
+      data: eventData,
+      include: {
+        ticketTypes: true,
+      },
+    });
+  }
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { EventService } from "../services/event.service";
 import { EventQuery } from "../models/interface";
+import { prisma } from "../prisma/client";
 
 export class EventController {
   private eventService: EventService;
@@ -79,6 +80,52 @@ export class EventController {
     } catch (error) {
       res.status(500).json({
         message: "Failed to fetch Events",
+        detail: error,
+      });
+    }
+  }
+
+  public async update(req: Request, res: Response): Promise<void> {
+    try {
+      const eventId = Number(req.params.id);
+      const userIdFromToken = (req as any).user?.id;
+
+      // Pastikan ID valid
+      if (isNaN(eventId)) {
+        res.status(400).json({ message: "Invalid event ID" });
+        return;
+      }
+
+      // Cari event-nya
+      const event = await prisma.event.findUnique({
+        where: { id: eventId },
+      });
+
+      // Event tidak ditemukan
+      if (!event) {
+        res.status(404).json({ message: "Event not found" });
+        return;
+      }
+
+      // Cek apakah user adalah pemilik event
+      if (event.organizerId !== userIdFromToken) {
+        res.status(403).json({
+          message: "Forbidden: You can only update your own event",
+        });
+        return;
+      }
+
+      const { ticketTypes, ...eventData } = req.body;
+      const result = await this.eventService.update(eventId, eventData);
+
+      res.status(200).json({
+        message: "Event Updated",
+        detail: result,
+      });
+    } catch (error) {
+      console.error("Update error:", error);
+      res.status(500).json({
+        message: "Failed to update event",
         detail: error,
       });
     }

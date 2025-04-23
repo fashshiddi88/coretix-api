@@ -25,5 +25,15 @@ export class EventRouter {
       ValidationMiddleware.validate({ body: eventSchema.body }),
       this.eventController.create.bind(this.eventController)
     );
+    this.router.put(
+      "/event/edit/:id",
+      AuthenticationMiddleware.verifyToken,
+      ValidationMiddleware.validate({
+        body: eventSchema.updateBody,
+        params: eventSchema.params,
+        partial: true,
+      }),
+      this.eventController.update.bind(this.eventController)
+    );
   }
 }
