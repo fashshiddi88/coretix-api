@@ -6,7 +6,7 @@ export const userSchema = {
     email: zod.string().email(),
     password: zod.string().min(6),
     referredBy: zod.string().optional(),
-    role: zod.enum(["CUSTOMER", "ORGANIZER"]),
+    role: zod.enum(["CUSTOMER", "ORGANIZER"]).optional().default("CUSTOMER"),
   }),
   params: zod.object({
     id: zod.string(),
@@ -18,6 +18,16 @@ export const ticketTypeSchema = zod.object({
   price: zod.number().min(0, "Ticket price must be a positive number"),
   totalQuantity: zod.number().int().min(1, "Total quantity must be at least 1"),
 });
+
+export const ticketTypeArraySchema = zod.array(ticketTypeSchema);
+
+export const ticketSchema = {
+  body: ticketTypeSchema,
+  array: ticketTypeArraySchema,
+  params: zod.object({
+    id: zod.string().regex(/^\d+$/, "ID must be a number"),
+  }),
+};
 
 const baseEventSchema = zod.object({
   title: zod.string().min(3, "Title must be at least 3 characters"),
