@@ -2,6 +2,9 @@ import { Router } from "express";
 import { EventController } from "../controllers/event.controller";
 import { ValidationMiddleware } from "../middlewares/validation.middleware";
 import { AuthenticationMiddleware } from "../middlewares/authentication.middleware";
+import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
+import { checkOwnership } from "../middlewares/checkOwnership.middleware";
+
 import { eventSchema } from "../lib/validations/validation.schema";
 
 export class EventRouter {
@@ -22,12 +25,15 @@ export class EventRouter {
     this.router.post(
       "/create-event",
       AuthenticationMiddleware.verifyToken,
+      AuthorizationMiddleware.allowRoles("ORGANIZER"),
       ValidationMiddleware.validate({ body: eventSchema.body }),
       this.eventController.create.bind(this.eventController)
     );
     this.router.put(
       "/event/edit/:id",
       AuthenticationMiddleware.verifyToken,
+      AuthorizationMiddleware.allowRoles("ORGANIZER"),
+      checkOwnership("id"),
       ValidationMiddleware.validate({
         body: eventSchema.updateBody,
         params: eventSchema.params,
