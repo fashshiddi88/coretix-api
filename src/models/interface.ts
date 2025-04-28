@@ -28,7 +28,13 @@ export interface TicketTypeInput {
 export interface EventInput {
   title: string;
   description: string;
-  category: string;
+  category:
+    | "KONSER"
+    | "KONFERENSI"
+    | "WORKSHOP"
+    | "PERTANDINGAN"
+    | "PERTUNJUKAN"
+    | "PAMERAN";
   location: string;
   startDate: string; // ISO date string
   endDate: string; // ISO date string

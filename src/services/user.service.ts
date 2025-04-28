@@ -1,6 +1,7 @@
 import { prisma } from "../prisma/client";
 import { UserInput } from "../models/interface";
 import { generateReferralCode } from "../lib/utils/generateReferralCode";
+import { hashPassword } from "../lib/utils/password.helper";
 import { ReferralService } from "./refferal.service";
 
 const referralService = new ReferralService();
@@ -18,10 +19,13 @@ export class UserService {
       if (!existing) isUnique = true;
     }
 
+    const hashedPassword = await hashPassword(data.password);
+
     // create user dulu
     const newUser = await prisma.user.create({
       data: {
         ...data,
+        password: hashedPassword,
         referralCode,
       },
     });

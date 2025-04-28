@@ -14,11 +14,8 @@ export class AuthService {
       return "Invalid email or password";
     }
 
-    // sebelum dicompare, hash dulu
-    const hashedPassword = (await hash(password, 10)) as any;
-
-    // kalau udah terdaftar, cek lagi passwordnya
-    const isValid = await bcrypt.compare(user.password, hashedPassword);
+    // compare password plain dari user dengan hashed password di database
+    const isValid = await bcrypt.compare(password, user.password);
 
     // pengecekan kedua : kalau gagal ditolak
     if (!isValid) {

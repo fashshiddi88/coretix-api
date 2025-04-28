@@ -39,7 +39,7 @@ const baseEventSchema = zod.object({
     "KONFERENSI",
     "WORKSHOP",
     "PERTANDINGAN",
-    "PERTUNJUKAM",
+    "PERTUNJUKAN",
     "PAMERAN",
   ]),
   location: zod.string().min(3, "Location is required"),

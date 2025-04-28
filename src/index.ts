@@ -4,6 +4,7 @@ import { UserRouter } from "./router/user.router";
 import { AuthRouter } from "./router/auth.router";
 import { EventRouter } from "./router/event.router";
 import { TicketTypeRouter } from "./router/ticketType.router";
+import { ProfileRouter } from "./router/profile.router";
 
 class Server {
   private app: Application;
@@ -26,6 +27,7 @@ class Server {
     this.app.use("/api", new AuthRouter().router);
     this.app.use("/api", new EventRouter().router);
     this.app.use("/api", new TicketTypeRouter().router);
+    this.app.use("/api", new ProfileRouter().router);
   }
 
   public start(): void {
