@@ -27,6 +27,15 @@ enum TransactionStatus {
   CANCELED
 }
 
+enum EventCategory {
+  KONSER
+  KONFERENSI
+  WORKSHOP
+  PERTANDINGAN
+  PERTUNJUKAN
+  PAMERAN
+}
+
 model User {
   id              Int              @id @default(autoincrement())
   name            String
@@ -52,11 +61,12 @@ model Event {
   id             Int           @id @default(autoincrement())
   title          String
   description    String
-  category       String
+  category       EventCategory
   location       String
   startDate      DateTime
   endDate        DateTime
-  price          Int
+  isFree         Boolean       @default(false)
+  price          Int           @default(0)
   imageUrl       String
   availableSeats Int
   createdAt      DateTime      @default(now())

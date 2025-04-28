@@ -34,7 +34,14 @@ const baseEventSchema = zod.object({
   description: zod
     .string()
     .min(10, "Description must be at least 10 characters"),
-  category: zod.string().min(3, "Category is required"),
+  category: zod.enum([
+    "KONSER",
+    "KONFERENSI",
+    "WORKSHOP",
+    "PERTANDINGAN",
+    "PERTUNJUKAM",
+    "PAMERAN",
+  ]),
   location: zod.string().min(3, "Location is required"),
   imageUrl: zod.string().url("Image URL must be valid"),
   price: zod.number().min(0, "Price must be a positive number"),
