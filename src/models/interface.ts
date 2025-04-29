@@ -7,8 +7,9 @@ export interface UserInput {
 }
 export interface UserPayLoad {
   id: number;
-  name: string;
-  role: "CUSTOMER" | "ORGANIZER";
+  name?: string;
+  role?: "CUSTOMER" | "ORGANIZER";
+  email?: string;
 }
 
 export interface EventQuery {

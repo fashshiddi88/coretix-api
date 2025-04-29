@@ -79,3 +79,11 @@ export const eventSchema = {
     id: zod.string().regex(/^\d+$/, "ID must be a number"),
   }),
 };
+
+export const authSchema = {
+  forgotPassword: zod.object({ email: zod.string().email() }),
+  resetPassword: zod.object({
+    token: zod.string(),
+    newPassword: zod.string().min(6),
+  }),
+};
