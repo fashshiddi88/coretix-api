@@ -13,7 +13,7 @@ export class AuthService {
 
     //pengecekan pertama kalau gagal tolak
     if (!user) {
-      return "Invalid email or password";
+      return "Email not found, please Sign Up";
     }
 
     // compare password plain dari user dengan hashed password di database
@@ -21,7 +21,7 @@ export class AuthService {
 
     // pengecekan kedua : kalau gagal ditolak
     if (!isValid) {
-      return "Invalid credentials";
+      return "Invalid email or password";
     }
 
     // tukar dengan token
