@@ -31,6 +31,7 @@ export class EventController {
         startDate,
         endDate,
         ticketTypes,
+        promotions,
       } = req.body;
 
       const event = await this.eventService.create(
@@ -45,6 +46,7 @@ export class EventController {
           startDate,
           endDate,
           ticketTypes,
+          promotions,
         },
         organizerId
       );

@@ -29,6 +29,19 @@ export const ticketSchema = {
   }),
 };
 
+export const promotionSchema = zod.object({
+  title: zod.string().min(1, "Promo name is required"),
+  code: zod.string().min(1, "Promo code is required"),
+  amount: zod.number().min(1, "Amount must be at least 1"),
+  startDate: zod
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), "Invalid start date"),
+  endDate: zod
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), "Invalid end date"),
+  quota: zod.number().int().positive().optional(),
+});
+
 const baseEventSchema = zod.object({
   title: zod.string().min(3, "Title must be at least 3 characters"),
   description: zod
@@ -58,6 +71,7 @@ const baseEventSchema = zod.object({
   ticketTypes: zod
     .array(ticketTypeSchema)
     .min(1, "At least one ticket type is required"),
+  promotions: zod.array(promotionSchema).optional(),
 });
 
 // Full schema dengan refine, untuk create

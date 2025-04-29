@@ -76,6 +76,7 @@ model Event {
   transactions   Transaction[]
   reviews        Review[]
   vouchers       Voucher[]
+  promotions     Promotion[]
 
   updatedAt DateTime  @updatedAt
   deleteAt  DateTime?
@@ -152,4 +153,21 @@ model UserVoucher {
   voucher   Voucher  @relation(fields: [voucherId], references: [code])
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model Promotion {
+  id        Int      @id @default(autoincrement())
+  title     String
+  code      String   @unique
+  amount    Int
+  startDate DateTime
+  endDate   DateTime
+  quota     Int?
+  used      Int      @default(0)
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
 }

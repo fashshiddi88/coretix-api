@@ -26,6 +26,15 @@ export interface TicketTypeInput {
   totalQuantity: number;
 }
 
+export interface PromotionInput {
+  title: string;
+  code: string;
+  amount: number;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  quota?: number;
+}
+
 export interface EventInput {
   title: string;
   description: string;
@@ -43,4 +52,5 @@ export interface EventInput {
   imageUrl: string;
   availableSeats: number;
   ticketTypes: TicketTypeInput[];
+  promotions: PromotionInput[];
 }

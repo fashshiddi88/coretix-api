@@ -29,11 +29,21 @@ export class EventService {
         data: ticketsData,
       });
 
-      // Ambil event lengkap dengan relasi ticketTypes
+      // tambah promotion jika ada
+      if (data.promotions && data.promotions.length > 0) {
+        const promotionsData = data.promotions.map((promo) => ({
+          ...promo,
+          eventId: event.id,
+        }));
+        await tx.promotion.createMany({ data: promotionsData });
+      }
+
+      // Ambil event lengkap
       const fullEvent = await tx.event.findUnique({
         where: { id: event.id },
         include: {
           ticketTypes: true,
+          promotions: true,
         },
       });
 
@@ -74,7 +84,7 @@ export class EventService {
   }
 
   public async update(id: number, data: Partial<EventInput>) {
-    const { ticketTypes, ...eventData } = data;
+    const { ticketTypes, promotions, ...eventData } = data;
 
     return await prisma.event.update({
       where: { id },
