@@ -5,6 +5,7 @@ import { AuthRouter } from "./router/auth.router";
 import { EventRouter } from "./router/event.router";
 import { TicketTypeRouter } from "./router/ticketType.router";
 import { ProfileRouter } from "./router/profile.router";
+import { PromotionRouter } from "./router/promotion.router";
 
 class Server {
   private app: Application;
@@ -28,6 +29,7 @@ class Server {
     this.app.use("/api", new EventRouter().router);
     this.app.use("/api", new TicketTypeRouter().router);
     this.app.use("/api", new ProfileRouter().router);
+    this.app.use("/api", new PromotionRouter().router);
   }
 
   public start(): void {

@@ -1,58 +1,60 @@
 import { Router } from "express";
-import { TicketTypesController } from "../controllers/ticketType.controller";
+import { PromotionController } from "../controllers/promotion.controller";
 import { ValidationMiddleware } from "../middlewares/validation.middleware";
 import { AuthenticationMiddleware } from "../middlewares/authentication.middleware";
 import { checkOwnership } from "../middlewares/checkOwnership.middleware";
 import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
-import { ticketSchema } from "../lib/validations/validation.schema";
 
-export class TicketTypeRouter {
+import { promoSchema } from "../lib/validations/validation.schema";
+
+export class PromotionRouter {
   public router: Router;
-  private ticketTypeController: TicketTypesController;
+  private promotionController: PromotionController;
 
   constructor() {
     this.router = Router();
-    this.ticketTypeController = new TicketTypesController();
+    this.promotionController = new PromotionController();
     this.routes();
   }
 
   private routes(): void {
     this.router.get(
-      "/event/:eventId/ticket",
+      "/event/:eventId/voucher_promotion",
       AuthenticationMiddleware.verifyToken,
       AuthorizationMiddleware.allowRoles("ORGANIZER"),
-      this.ticketTypeController.findByEventId.bind(this.ticketTypeController)
+      this.promotionController.findByEventId.bind(this.promotionController)
     );
-    //add tiket
+    //add Promotion
     this.router.post(
-      "/event/:eventId/ticket",
+      "/event/:eventId/voucher_promotion",
       AuthenticationMiddleware.verifyToken,
       checkOwnership("eventId"),
       AuthorizationMiddleware.allowRoles("ORGANIZER"),
-      ValidationMiddleware.validate({ body: ticketSchema.array }),
-      this.ticketTypeController.createBulk.bind(this.ticketTypeController)
+      ValidationMiddleware.validate({ body: promoSchema.array }),
+      this.promotionController.createBulk.bind(this.promotionController)
     );
+
     this.router.put(
-      "/event/ticket/:id",
+      "/event/voucher_promotion/:id",
       AuthenticationMiddleware.verifyToken,
       checkOwnership("id"),
       AuthorizationMiddleware.allowRoles("ORGANIZER"),
       ValidationMiddleware.validate({
-        body: ticketSchema.body.partial(),
-        params: ticketSchema.params,
+        body: promoSchema.body.partial(),
+        params: promoSchema.params,
         partial: true,
       }),
-      this.ticketTypeController.update.bind(this.ticketTypeController)
+      this.promotionController.update.bind(this.promotionController)
     );
     this.router.delete(
-      "/event/ticket/:id",
+      "/event/voucher_promotion/:id",
       AuthenticationMiddleware.verifyToken,
       checkOwnership("id"),
       AuthorizationMiddleware.allowRoles("ORGANIZER"),
       ValidationMiddleware.validate({
-        params: ticketSchema.params,
+        params: promoSchema.params,
       }),
-      this.ticketTypeController.delete.bind(this.ticketTypeController)
+      this.promotionController.delete.bind(this.promotionController)
     );
   }
 }

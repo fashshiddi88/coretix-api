@@ -1,4 +1,4 @@
-import { z as zod } from "zod";
+import { array, z as zod } from "zod";
 
 export const userSchema = {
   body: zod.object({
@@ -41,6 +41,16 @@ export const promotionSchema = zod.object({
     .refine((val) => !isNaN(Date.parse(val)), "Invalid end date"),
   quota: zod.number().int().positive().optional(),
 });
+
+export const promotionArraySchema = zod.array(promotionSchema);
+
+export const promoSchema = {
+  body: promotionSchema,
+  array: promotionArraySchema,
+  params: zod.object({
+    id: zod.string().regex(/^\d+$/, "ID must be a number"),
+  }),
+};
 
 const baseEventSchema = zod.object({
   title: zod.string().min(3, "Title must be at least 3 characters"),

@@ -7,23 +7,47 @@ export function checkOwnership(paramName: "id" | "eventId") {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const eventId = Number(req.params[paramName]);
+    const paramValue = Number(req.params[paramName]);
     const userIdFromToken = (req as any).user?.id;
 
-    if (!eventId) {
-      res.status(400).json({ message: "Invalid or missing event ID" });
+    if (!paramValue) {
+      res.status(400).json({ message: "Invalid or missing ID" });
       return;
     }
 
     try {
-      const event = await prisma.event.findUnique({ where: { id: eventId } });
+      let eventId: number | null = null;
 
-      if (!event) {
+      if (paramName === "eventId") {
+        eventId = paramValue;
+      } else if (paramName === "id") {
+        // Cek dari TicketType
+        const ticketType = await prisma.ticketType.findUnique({
+          where: { id: paramValue },
+        });
+        if (ticketType) {
+          eventId = ticketType.eventId;
+        }
+
+        // Cek dari Promotion
+        if (!eventId) {
+          const promotion = await prisma.promotion.findUnique({
+            where: { id: paramValue },
+          });
+          if (promotion) {
+            eventId = promotion.eventId;
+          }
+        }
+      }
+
+      if (!eventId) {
         res.status(404).json({ message: "Event not found" });
         return;
       }
 
-      if (event.organizerId !== userIdFromToken) {
+      const event = await prisma.event.findUnique({ where: { id: eventId } });
+
+      if (!event || event.organizerId !== userIdFromToken) {
         res.status(403).json({
           message: "Forbidden: You can only modify your own event",
         });
