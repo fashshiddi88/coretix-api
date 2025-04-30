@@ -59,7 +59,7 @@ export class ReferralService {
     await prisma.voucher.create({
       data: {
         code: voucherCode,
-        discount: 10,
+        discount: 10000,
         startDate: new Date(),
         endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
         eventId: null,

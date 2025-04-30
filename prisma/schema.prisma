@@ -101,16 +101,28 @@ model Transaction {
   event        Event             @relation(fields: [eventId], references: [id])
   ticketTypeId Int
   ticketType   TicketType        @relation(fields: [ticketTypeId], references: [id])
-  quantity     Int
+  quantity     Int               @default(1)
   totalPrice   Int
   paymentProof String?
   status       TransactionStatus
   pointsUsed   Int               @default(0)
   voucherCode  String?
-  expiresAt    DateTime
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  deleteAt     DateTime?
+
+  autoCanceledAt DateTime?
+  confirmedAt    DateTime?
+  rejectedAt     DateTime?
+  voucherId      String?
+  voucher        Voucher?   @relation(fields: [voucherId], references: [code])
+  promotionId    Int?
+  promotion      Promotion? @relation(fields: [promotionId], references: [id])
+  expiresAt      DateTime
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deleteAt       DateTime?
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([status])
 }
 
 model Voucher {
@@ -121,6 +133,7 @@ model Voucher {
   eventId      Int?
   event        Event?        @relation(fields: [eventId], references: [id])
   userVouchers UserVoucher[]
+  transaction  Transaction[]
 }
 
 model Review {
@@ -156,16 +169,17 @@ model UserVoucher {
 }
 
 model Promotion {
-  id        Int      @id @default(autoincrement())
-  title     String
-  code      String   @unique
-  amount    Int
-  startDate DateTime
-  endDate   DateTime
-  quota     Int?
-  used      Int      @default(0)
-  eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
+  id          Int           @id @default(autoincrement())
+  title       String
+  code        String        @unique
+  amount      Int
+  startDate   DateTime
+  endDate     DateTime
+  quota       Int?
+  used        Int           @default(0)
+  eventId     Int
+  event       Event         @relation(fields: [eventId], references: [id])
+  transaction Transaction[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
