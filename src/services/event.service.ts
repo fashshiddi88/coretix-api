@@ -83,6 +83,23 @@ export class EventService {
     };
   }
 
+  // Menampilkan detail event berdasarkan ID
+  public async findById(id: number) {
+    const event = await prisma.event.findUnique({
+      where: { id },
+      include: {
+        ticketTypes: true,
+        promotions: true,
+      },
+    });
+
+    if (!event) {
+      throw new Error("Event not found");
+    }
+
+    return event;
+  }
+
   public async update(id: number, data: Partial<EventInput>) {
     const { ticketTypes, promotions, ...eventData } = data;
 

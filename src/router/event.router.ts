@@ -22,6 +22,10 @@ export class EventRouter {
       "/events",
       this.eventController.findAll.bind(this.eventController)
     );
+    this.router.get(
+      "/event/:id",
+      this.eventController.findById.bind(this.eventController)
+    );
     this.router.post(
       "/create-event",
       AuthenticationMiddleware.verifyToken,

@@ -87,6 +87,22 @@ export class EventController {
     }
   }
 
+  public async findById(req: Request, res: Response): Promise<void> {
+    try {
+      const eventId = Number(req.params.id);
+      const event = await this.eventService.findById(eventId);
+      res.status(200).json({
+        message: "Event details fetched successfully",
+        detail: event,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Failed to fetch Event details",
+        detail: error,
+      });
+    }
+  }
+
   public async update(req: Request, res: Response): Promise<void> {
     try {
       const eventId = Number(req.params.id);
