@@ -17,13 +17,12 @@ export class TransactionController {
         res.status(400).json({ message: "Invalid ticketTypeId" });
       }
 
-      const { promotionCode, voucherCode, pointsUsed } = req.body;
       const transaction = await this.transactionService.create({
         userId,
         ticketTypeId,
-        promotionCode,
-        voucherCode,
-        pointsUsed,
+        promotionCode: req.body.promotionCode,
+        voucherCode: req.body.voucherCode,
+        usePoints: req.body.usePoints ?? false,
       });
 
       res.status(201).json({

@@ -111,3 +111,13 @@ export const authSchema = {
     newPassword: zod.string().min(6),
   }),
 };
+
+export const createTransactionSchema = zod.object({
+  promotionCode: zod.string().optional(),
+  voucherCode: zod.string().optional(),
+  usePoints: zod.boolean().optional(),
+});
+
+export const ticketTypeParamSchema = zod.object({
+  ticketTypeId: zod.string().regex(/^\d+$/, "ticketTypeId must be a number"),
+});

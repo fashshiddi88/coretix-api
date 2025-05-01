@@ -7,7 +7,7 @@ export class TransactionService {
     ticketTypeId: number;
     promotionCode?: string;
     voucherCode?: string;
-    pointsUsed?: number;
+    usePoints?: boolean;
   }) {
     const ticket = await prisma.ticketType.findUnique({
       where: { id: data.ticketTypeId },
@@ -24,6 +24,7 @@ export class TransactionService {
     let finalPrice = ticket.price;
     let promotionId: number | undefined;
     let voucherId: string | undefined;
+    let pointsUsed = 0;
 
     // Handle promotion
     if (data.promotionCode) {
@@ -64,9 +65,19 @@ export class TransactionService {
       voucherId = voucher.code;
     }
 
-    // Use points
-    const pointsUsed = data.pointsUsed ?? 0;
-    finalPrice -= pointsUsed;
+    // Use all user points if requested
+    if (data.usePoints) {
+      const user = await prisma.user.findUnique({
+        where: { id: data.userId },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      pointsUsed = Math.min(user.points, finalPrice);
+      finalPrice -= pointsUsed;
+    }
 
     finalPrice = Math.max(finalPrice, 0);
 
