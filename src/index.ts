@@ -7,6 +7,7 @@ import { TicketTypeRouter } from "./router/ticketType.router";
 import { ProfileRouter } from "./router/profile.router";
 import { PromotionRouter } from "./router/promotion.router";
 import { TransactionRouter } from "./router/transaction.router";
+import { startTransactionStatusJob } from "./cron/jobs/transactionJobs";
 
 class Server {
   private app: Application;
@@ -41,5 +42,6 @@ class Server {
   }
 }
 
+startTransactionStatusJob();
 const server = new Server();
 server.start();
