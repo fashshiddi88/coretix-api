@@ -113,6 +113,7 @@ export const authSchema = {
 };
 
 export const createTransactionSchema = zod.object({
+  ticketTypeId: zod.number(),
   promotionCode: zod.string().optional(),
   voucherCode: zod.string().optional(),
   usePoints: zod.boolean().optional(),

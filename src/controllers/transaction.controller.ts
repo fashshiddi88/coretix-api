@@ -11,15 +11,10 @@ export class TransactionController {
   public async create(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const ticketTypeId = parseInt(req.params.ticketTypeId);
-
-      if (isNaN(ticketTypeId)) {
-        res.status(400).json({ message: "Invalid ticketTypeId" });
-      }
 
       const transaction = await this.transactionService.create({
         userId,
-        ticketTypeId,
+        ticketTypeId: req.body.ticketTypeId,
         promotionCode: req.body.promotionCode,
         voucherCode: req.body.voucherCode,
         usePoints: req.body.usePoints ?? false,

@@ -19,12 +19,11 @@ export class TransactionRouter {
 
   private routes(): void {
     this.router.post(
-      "/transactions/:ticketTypeId",
+      "/transactions",
       AuthenticationMiddleware.verifyToken,
       AuthorizationMiddleware.allowRoles("CUSTOMER"),
       ValidationMiddleware.validate({
         body: createTransactionSchema,
-        params: ticketTypeParamSchema,
       }),
       this.transactionController.create.bind(this.transactionController)
     );

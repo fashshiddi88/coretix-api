@@ -20,8 +20,6 @@ export class PromotionRouter {
   private routes(): void {
     this.router.get(
       "/event/:eventId/voucher_promotion",
-      AuthenticationMiddleware.verifyToken,
-      AuthorizationMiddleware.allowRoles("ORGANIZER"),
       this.promotionController.findByEventId.bind(this.promotionController)
     );
     //add Promotion
