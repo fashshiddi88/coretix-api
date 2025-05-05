@@ -46,8 +46,8 @@ export class EventController {
           availableSeats: Number(availableSeats),
           startDate,
           endDate,
-          ticketTypes: JSON.parse(ticketTypes),
-          promotions: promotions ? JSON.parse(promotions) : [],
+          ticketTypes,
+          promotions,
         },
         organizerId,
         file

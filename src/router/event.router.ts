@@ -5,6 +5,7 @@ import { AuthenticationMiddleware } from "../middlewares/authentication.middlewa
 import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
 import { checkOwnership } from "../middlewares/checkOwnership.middleware";
 import { uploadEventImage } from "../middlewares/upload.middleware";
+import { parseMultipartBody } from "../middlewares/parseMultipartBody.middleware";
 
 import { eventSchema } from "../lib/validations/validation.schema";
 
@@ -32,6 +33,7 @@ export class EventRouter {
       AuthenticationMiddleware.verifyToken,
       AuthorizationMiddleware.allowRoles("ORGANIZER"),
       uploadEventImage.single("image"),
+      parseMultipartBody,
       ValidationMiddleware.validate({ body: eventSchema.body }),
       this.eventController.create.bind(this.eventController)
     );
