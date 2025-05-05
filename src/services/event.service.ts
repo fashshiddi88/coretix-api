@@ -2,15 +2,26 @@ import { prisma } from "../prisma/client";
 import { EventInput, EventQuery } from "../models/interface";
 
 export class EventService {
-  public async create(data: EventInput, organizerId: number) {
+  public async create(
+    data: EventInput,
+    organizerId: number,
+    file?: Express.Multer.File
+  ) {
     return await prisma.$transaction(async (tx) => {
+      let imageUrl = data.imageUrl || "";
+      if (file && file.path) {
+        imageUrl = file.path;
+      } else if (file && !file.path) {
+        throw new Error("File uploaded but Cloudinary URL is missing.");
+      }
+
       const event = await tx.event.create({
         data: {
           title: data.title,
           description: data.description,
           category: data.category,
           location: data.location,
-          imageUrl: data.imageUrl,
+          imageUrl: imageUrl,
           price: data.price,
           availableSeats: data.availableSeats,
           startDate: data.startDate,
@@ -100,8 +111,16 @@ export class EventService {
     return event;
   }
 
-  public async update(id: number, data: Partial<EventInput>) {
+  public async update(
+    id: number,
+    data: Partial<EventInput>,
+    file?: Express.Multer.File
+  ) {
     const { ticketTypes, promotions, ...eventData } = data;
+
+    if (file?.path) {
+      (eventData as any).imageUrl = file.path;
+    }
 
     return await prisma.event.update({
       where: { id },

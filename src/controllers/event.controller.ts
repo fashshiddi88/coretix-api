@@ -14,6 +14,7 @@ export class EventController {
     try {
       const organizerId = (req as any).user?.id;
       const role = (req as any).user?.role;
+      const file = req.file;
 
       if (role !== "ORGANIZER") {
         res.status(403).json({ message: "Only organizers can create events" });
@@ -41,14 +42,15 @@ export class EventController {
           category,
           location,
           imageUrl,
-          price,
-          availableSeats,
+          price: Number(price),
+          availableSeats: Number(availableSeats),
           startDate,
           endDate,
-          ticketTypes,
-          promotions,
+          ticketTypes: JSON.parse(ticketTypes),
+          promotions: promotions ? JSON.parse(promotions) : [],
         },
-        organizerId
+        organizerId,
+        file
       );
 
       res.status(201).json({
@@ -57,9 +59,10 @@ export class EventController {
       });
     } catch (error) {
       console.error("Create event error:", error);
+
       res.status(500).json({
         message: "Failed to create event",
-        detail: error,
+        detail: error instanceof Error ? error.message : error,
       });
     }
   }
@@ -107,6 +110,7 @@ export class EventController {
     try {
       const eventId = Number(req.params.id);
       const userIdFromToken = (req as any).user?.id;
+      const file = req.file;
 
       // Pastikan ID valid
       if (isNaN(eventId)) {
@@ -133,8 +137,16 @@ export class EventController {
         return;
       }
 
-      const { ticketTypes, ...eventData } = req.body;
-      const result = await this.eventService.update(eventId, eventData);
+      const { ticketTypes, promotions, ...eventData } = req.body;
+      const result = await this.eventService.update(
+        eventId,
+        {
+          ...eventData,
+          ticketTypes: ticketTypes ? JSON.parse(ticketTypes) : undefined,
+          promotions: promotions ? JSON.parse(promotions) : undefined,
+        },
+        file
+      );
 
       res.status(200).json({
         message: "Event Updated",

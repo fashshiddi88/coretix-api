@@ -66,7 +66,7 @@ const baseEventSchema = zod.object({
     "PAMERAN",
   ]),
   location: zod.string().min(3, "Location is required"),
-  imageUrl: zod.string().url("Image URL must be valid"),
+  imageUrl: zod.string().url("Image URL must be valid").optional(),
   price: zod.number().min(0, "Price must be a positive number"),
   availableSeats: zod
     .number()
