@@ -5,6 +5,7 @@ import { ValidationMiddleware } from "../middlewares/validation.middleware";
 import { TransactionController } from "../controllers/transaction.controller";
 
 import { createTransactionSchema } from "../lib/validations/validation.schema";
+import { upload } from "../middlewares/upload.middleware";
 import { ticketTypeParamSchema } from "../lib/validations/validation.schema";
 
 export class TransactionRouter {
@@ -26,6 +27,16 @@ export class TransactionRouter {
         body: createTransactionSchema,
       }),
       this.transactionController.create.bind(this.transactionController)
+    );
+
+    this.router.post(
+      "/transactions/:id/payment-proof",
+      AuthenticationMiddleware.verifyToken,
+      AuthorizationMiddleware.allowRoles("CUSTOMER"),
+      upload.single("file"), // Upload 1 file dengan field name "file"
+      this.transactionController.uploadPaymentProof.bind(
+        this.transactionController
+      )
     );
   }
 }

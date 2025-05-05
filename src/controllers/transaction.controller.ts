@@ -32,4 +32,33 @@ export class TransactionController {
       });
     }
   }
+
+  public async uploadPaymentProof(req: Request, res: Response): Promise<void> {
+    try {
+      const transactionId = Number(req.params.id);
+      const userId = (req as any).user?.id;
+      const file = (req as any).file as Express.Multer.File;
+
+      if (!file) {
+        res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const result = await this.transactionService.uploadPaymentProof({
+        transactionId,
+        userId,
+        fileUrl: file.path,
+      });
+
+      res.status(200).json({
+        message: "Payment proof uploaded successfully",
+        detail: result,
+      });
+    } catch (error: any) {
+      console.error("Upload payment proof error:", error);
+      res.status(500).json({
+        message: "Failed to upload payment proof",
+        detail: error.message,
+      });
+    }
+  }
 }

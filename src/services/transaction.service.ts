@@ -130,4 +130,41 @@ export class TransactionService {
 
     return transaction;
   }
+
+  public async uploadPaymentProof({
+    transactionId,
+    userId,
+    fileUrl,
+  }: {
+    transactionId: number;
+    userId: number;
+    fileUrl: string;
+  }) {
+    const trx = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+    });
+
+    if (!trx || trx.userId !== userId) {
+      throw new Error("Transaction not found or unauthorized");
+    }
+
+    if (trx.status !== "WAITING_PAYMENT") {
+      throw new Error(
+        "Cannot upload payment proof in current transaction status"
+      );
+    }
+
+    const threeDaysLater = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+    const updated = await prisma.transaction.update({
+      where: { id: transactionId },
+      data: {
+        paymentProof: fileUrl,
+        status: "WAITING_CONFIRMATION",
+        autoCanceledAt: threeDaysLater,
+      },
+    });
+
+    return updated;
+  }
 }
