@@ -60,4 +60,26 @@ export class ProfileController {
         .json({ message: error.message || "Internal server error" });
     }
   }
+
+  public async getProfile(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+
+      const user = await this.profileService.getProfile(userId);
+
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+
+      res
+        .status(200)
+        .json({ message: "Profile fetched successfully", detail: user });
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Failed to fetch profile", detail: error });
+    }
+  }
 }

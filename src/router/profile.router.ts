@@ -25,5 +25,10 @@ export class ProfileRouter {
       AuthenticationMiddleware.verifyToken,
       this.profileController.changePassword.bind(this.profileController)
     );
+    this.router.get(
+      "/profile",
+      AuthenticationMiddleware.verifyToken,
+      this.profileController.getProfile.bind(this.profileController)
+    );
   }
 }
