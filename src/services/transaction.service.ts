@@ -1,5 +1,6 @@
 import { prisma } from "../prisma/client";
 import { TransactionStatus } from "@prisma/client";
+import { restoreResources } from "../lib/utils/transactionUtils";
 
 export class TransactionService {
   public async create(data: {
@@ -166,5 +167,57 @@ export class TransactionService {
     });
 
     return updated;
+  }
+
+  // Menerima transaksi
+  public async acceptTransaction(transactionId: number, organizerId: number) {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      include: { event: true },
+    });
+
+    if (!transaction) throw new Error("Transaction not found");
+    if (transaction.event.organizerId !== organizerId)
+      throw new Error("Unauthorized");
+
+    if (transaction.status !== "WAITING_CONFIRMATION")
+      throw new Error(
+        "Only transactions waiting for confirmation can be accepted"
+      );
+
+    return prisma.transaction.update({
+      where: { id: transactionId },
+      data: { status: "DONE", confirmedAt: new Date() },
+    });
+  }
+
+  // Menolak transaksi
+  public async rejectTransaction(transactionId: number, organizerId: number) {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      include: {
+        event: true,
+      },
+    });
+
+    if (!transaction) throw new Error("Transaction not found");
+    if (transaction.event.organizerId !== organizerId)
+      throw new Error("Unauthorized");
+
+    if (transaction.status !== "WAITING_CONFIRMATION")
+      throw new Error(
+        "Only transactions waiting for confirmation can be rejected"
+      );
+
+    return await prisma.$transaction(async (tx) => {
+      // rollback resource
+      await restoreResources(tx, transaction);
+
+      // ubah status jadi REJECTED
+      return await tx.transaction.update({
+        where: { id: transactionId },
+        data: { status: "REJECTED", rejectedAt: new Date() },
+      });
+    });
   }
 }

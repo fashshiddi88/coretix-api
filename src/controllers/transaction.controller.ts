@@ -61,4 +61,40 @@ export class TransactionController {
       });
     }
   }
+
+  // Accept
+  public async acceptTransaction(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      const organizerId = (req as any).user?.id;
+
+      const result = await this.transactionService.acceptTransaction(
+        id,
+        organizerId
+      );
+      res.status(200).json({ message: "Transaction accepted", detail: result });
+    } catch (error) {
+      res
+        .status(400)
+        .json({ message: "Failed to accept transaction", detail: error });
+    }
+  }
+
+  // Reject
+  public async rejectTransaction(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      const organizerId = (req as any).user?.id;
+
+      const result = await this.transactionService.rejectTransaction(
+        id,
+        organizerId
+      );
+      res.status(200).json({ message: "Transaction rejected", detail: result });
+    } catch (error) {
+      res
+        .status(400)
+        .json({ message: "Failed to reject transaction", detail: error });
+    }
+  }
 }
