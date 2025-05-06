@@ -20,6 +20,11 @@ export interface EventQuery {
   limit?: number;
 }
 
+export interface TransactionQuery {
+  page?: number;
+  limit?: number;
+}
+
 export interface TicketTypeInput {
   name: string;
   price: number;

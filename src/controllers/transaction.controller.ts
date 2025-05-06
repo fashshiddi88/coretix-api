@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import { TransactionStatus } from "@prisma/client";
 import { TransactionService } from "../services/transaction.service";
+import { TransactionQuery } from "../models/interface";
 
 export class TransactionController {
   private transactionService: TransactionService;
@@ -95,6 +97,41 @@ export class TransactionController {
       res
         .status(400)
         .json({ message: "Failed to reject transaction", detail: error });
+    }
+  }
+
+  public async getAllTransaction(req: Request, res: Response): Promise<void> {
+    try {
+      const organizerId = (req as any).user?.id;
+
+      // Ambil query dan konversi ke tipe yang sesuai
+      const query: TransactionQuery & {
+        status?: TransactionStatus;
+        eventId?: number;
+      } = {
+        page: req.query.page ? parseInt(req.query.page as string) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 10,
+        status: req.query.status as TransactionStatus,
+        eventId: req.query.eventId
+          ? parseInt(req.query.eventId as string)
+          : undefined,
+      };
+
+      const result = await this.transactionService.getAllTransaction(
+        query,
+        organizerId
+      );
+
+      res.status(200).json({
+        message: "Successfully retrieved transactions",
+        detail: result,
+      });
+    } catch (error) {
+      console.error("Get All Transaction Error:", error);
+      res.status(500).json({
+        message: "Failed to retrieve transactions",
+        detail: error,
+      });
     }
   }
 }

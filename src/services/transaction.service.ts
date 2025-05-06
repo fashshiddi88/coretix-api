@@ -1,6 +1,7 @@
 import { prisma } from "../prisma/client";
 import { TransactionStatus } from "@prisma/client";
 import { restoreResources } from "../lib/utils/transactionUtils";
+import { TransactionQuery } from "../models/interface";
 
 export class TransactionService {
   public async create(data: {
@@ -219,5 +220,42 @@ export class TransactionService {
         data: { status: "REJECTED", rejectedAt: new Date() },
       });
     });
+  }
+
+  public async getAllTransaction(
+    query: TransactionQuery & { status?: TransactionStatus; eventId?: number },
+    organizerId: number
+  ) {
+    const { page = 1, limit = 10, status, eventId } = query;
+
+    const where: any = {
+      ticketType: {
+        event: {
+          organizerId: organizerId,
+          ...(eventId && { id: eventId }),
+        },
+      },
+      ...(status && { status }),
+    };
+
+    const total = await prisma.transaction.count({ where });
+
+    const transactions = await prisma.transaction.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: "asc" },
+      include: {
+        user: true,
+        ticketType: {
+          include: { event: true },
+        },
+      },
+    });
+
+    return {
+      transactions,
+      total,
+    };
   }
 }

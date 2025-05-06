@@ -56,5 +56,14 @@ export class TransactionRouter {
         this.transactionController
       )
     );
+
+    this.router.get(
+      "/transactions-list/",
+      AuthenticationMiddleware.verifyToken,
+      AuthorizationMiddleware.allowRoles("ORGANIZER"),
+      this.transactionController.getAllTransaction.bind(
+        this.transactionController
+      )
+    );
   }
 }
