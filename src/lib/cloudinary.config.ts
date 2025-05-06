@@ -24,5 +24,13 @@ export const eventStorage = new CloudinaryStorage({
     public_id: `event-${Date.now()}`,
   }),
 });
+export const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => ({
+    folder: "profile-images",
+    allowed_formats: ["jpg", "jpeg", "png"],
+    public_id: `profile-${Date.now()}`,
+  }),
+});
 
 export { cloudinary };

@@ -9,13 +9,15 @@ export class ProfileController {
   }
   public async updateProfile(req: Request, res: Response) {
     try {
-      const userId = (req as any).user?.id; // ambil dari token (pastikan AuthenticationMiddleware udah pasang user ke req)
-      const { name, profileImage } = req.body;
+      const userId = (req as any).user?.id;
+      const { name } = req.body;
+      const file = req.file;
 
-      const updatedUser = await this.profileService.updateProfile(userId, {
-        name,
-        profileImage,
-      });
+      const updatedUser = await this.profileService.updateProfile(
+        userId,
+        { name },
+        file
+      );
 
       res.status(200).json({
         message: "Profile updated successfully",

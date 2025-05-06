@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { AuthenticationMiddleware } from "../middlewares/authentication.middleware";
 import { ProfileController } from "../controllers/profile.controller";
+import { uploadProfileImage } from "../middlewares/upload.middleware";
 
 export class ProfileRouter {
   public router: Router;
@@ -16,6 +17,7 @@ export class ProfileRouter {
     this.router.put(
       "/profile",
       AuthenticationMiddleware.verifyToken,
+      uploadProfileImage.single("image"),
       this.profileController.updateProfile.bind(this.profileController)
     );
     this.router.patch(

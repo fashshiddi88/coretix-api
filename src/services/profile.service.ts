@@ -4,13 +4,17 @@ import { comparePassword, hashPassword } from "../lib/utils/password.helper";
 export class ProfileService {
   public async updateProfile(
     userId: number,
-    data: { name?: string; profileImage?: string }
+    data: { name?: string; profileImage?: string },
+    file?: Express.Multer.File
   ) {
+    const updateData = { ...data };
+
+    if (file?.path) {
+      updateData.profileImage = file.path; // ✅ simpan URL/path ke profileImage
+    }
     return prisma.user.update({
       where: { id: userId },
-      data: {
-        ...data,
-      },
+      data: updateData,
     });
   }
 
