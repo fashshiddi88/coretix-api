@@ -101,6 +101,13 @@ export class EventService {
       include: {
         ticketTypes: true,
         promotions: true,
+        organizer: {
+          select: {
+            id: true,
+            name: true,
+            profileImage: true,
+          },
+        },
       },
     });
 
