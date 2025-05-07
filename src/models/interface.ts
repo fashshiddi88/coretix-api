@@ -44,12 +44,14 @@ export interface EventInput {
   title: string;
   description: string;
   category:
-    | "KONSER"
-    | "KONFERENSI"
-    | "WORKSHOP"
-    | "PERTANDINGAN"
-    | "PERTUNJUKAN"
-    | "PAMERAN";
+    | "SPORTS"
+    | "MUSIC"
+    | "ART"
+    | "CONFERENCE"
+    | "COMMUNITY"
+    | "THEATER"
+    | "EDUCATION"
+    | "ATTRACTION";
   location: string;
   startDate: string; // ISO date string
   endDate: string; // ISO date string
