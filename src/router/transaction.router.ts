@@ -38,32 +38,5 @@ export class TransactionRouter {
         this.transactionController
       )
     );
-
-    this.router.patch(
-      "/transactions/:id/accept",
-      AuthenticationMiddleware.verifyToken,
-      AuthorizationMiddleware.allowRoles("ORGANIZER"),
-      this.transactionController.acceptTransaction.bind(
-        this.transactionController
-      )
-    );
-
-    this.router.patch(
-      "/transactions/:id/reject",
-      AuthenticationMiddleware.verifyToken,
-      AuthorizationMiddleware.allowRoles("ORGANIZER"),
-      this.transactionController.rejectTransaction.bind(
-        this.transactionController
-      )
-    );
-
-    this.router.get(
-      "/transactions-list/",
-      AuthenticationMiddleware.verifyToken,
-      AuthorizationMiddleware.allowRoles("ORGANIZER"),
-      this.transactionController.getAllTransaction.bind(
-        this.transactionController
-      )
-    );
   }
 }

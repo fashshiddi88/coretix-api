@@ -59,3 +59,10 @@ export interface EventInput {
   ticketTypes: TicketTypeInput[];
   promotions: PromotionInput[];
 }
+
+export interface StatisticsQuery {
+  organizerId: number;
+  period: "day" | "month" | "year";
+  year: number;
+  month?: number; // hanya untuk period = day
+}

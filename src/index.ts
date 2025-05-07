@@ -7,6 +7,7 @@ import { TicketTypeRouter } from "./router/ticketType.router";
 import { ProfileRouter } from "./router/profile.router";
 import { PromotionRouter } from "./router/promotion.router";
 import { TransactionRouter } from "./router/transaction.router";
+import { DashboardRouter } from "./router/dashboard.router";
 import { startTransactionStatusJob } from "./cron/jobs/transactionJobs";
 
 class Server {
@@ -33,6 +34,7 @@ class Server {
     this.app.use("/api", new ProfileRouter().router);
     this.app.use("/api", new PromotionRouter().router);
     this.app.use("/api", new TransactionRouter().router);
+    this.app.use("/api", new DashboardRouter().router);
   }
 
   public start(): void {
