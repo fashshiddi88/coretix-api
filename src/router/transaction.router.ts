@@ -38,5 +38,14 @@ export class TransactionRouter {
         this.transactionController
       )
     );
+
+    this.router.get(
+      "/my-transactions",
+      AuthenticationMiddleware.verifyToken,
+      AuthorizationMiddleware.allowRoles("CUSTOMER"),
+      this.transactionController.getUserTransactions.bind(
+        this.transactionController
+      )
+    );
   }
 }

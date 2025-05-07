@@ -63,4 +63,29 @@ export class TransactionController {
       });
     }
   }
+
+  public async getUserTransactions(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+
+      if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const query = {
+        page: req.query.page ? parseInt(req.query.page as string) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 10,
+        status: req.query.status as string | undefined,
+      };
+
+      const data = await this.transactionService.getUserTransactions(
+        userId,
+        query
+      );
+
+      res.json({ message: "Success", ...data });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get transactions", error });
+    }
+  }
 }

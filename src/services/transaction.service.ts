@@ -1,4 +1,5 @@
 import { prisma } from "../prisma/client";
+import { TransactionQuery } from "../models/interface";
 import { TransactionStatus } from "@prisma/client";
 
 export class TransactionService {
@@ -166,5 +167,33 @@ export class TransactionService {
     });
 
     return updated;
+  }
+
+  //lihat transaksi yg dibuat
+  public async getUserTransactions(
+    userId: number,
+    query: TransactionQuery & { status?: string }
+  ) {
+    const { page = 1, limit = 10, status } = query;
+
+    const where: any = { userId };
+    if (status) {
+      where.status = status;
+    }
+
+    const total = await prisma.transaction.count({ where });
+
+    const transactions = await prisma.transaction.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        event: true,
+        ticketType: true,
+      },
+    });
+
+    return { total, transactions };
   }
 }
