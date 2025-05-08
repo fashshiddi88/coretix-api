@@ -7,17 +7,17 @@ export class AuthenticationMiddleware {
       const authHeader = req.headers.authorization;
 
       if (!authHeader || !authHeader.startsWith("Bearer")) {
-        res.status(401).json({
+        return res.status(401).json({
           message: "Unauthorized: no token provided",
         });
       }
 
-      const token = authHeader?.split(" ")[1];
-      const decoded = JwtUtils.verifyToken(token as string) as any;
+      const token = authHeader.split(" ")[1];
+      const decoded = JwtUtils.verifyToken(token) as any;
       (req as any).user = decoded;
-      next();
+      return next();
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Unauthorized: invalid token",
       });
     }

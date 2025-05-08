@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-//import cors from 'cors';
+import cors from "cors";
 import { UserRouter } from "./router/user.router";
 import { AuthRouter } from "./router/auth.router";
 import { EventRouter } from "./router/event.router";
@@ -22,7 +22,7 @@ class Server {
   }
 
   private middlewares(): void {
-    //this.app.use(cors());
+    this.app.use(cors());
     this.app.use(express.json());
   }
 
