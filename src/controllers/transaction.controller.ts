@@ -35,6 +35,32 @@ export class TransactionController {
     }
   }
 
+  public async getTransactionById(req: Request, res: Response): Promise<void> {
+    try {
+      const transactionId = Number(req.params.id);
+      const userId = (req as any).user?.id;
+
+      if (isNaN(transactionId)) {
+        res.status(400).json({ message: "Invalid transaction ID" });
+        return;
+      }
+
+      const transaction = await this.transactionService.getTransactionById({
+        transactionId,
+        userId,
+      });
+
+      res.status(200).json({
+        message: "Transaction fetched successfully",
+        data: transaction,
+      });
+    } catch (error: any) {
+      res
+        .status(400)
+        .json({ message: error.message || "Failed to get transaction" });
+    }
+  }
+
   public async uploadPaymentProof(req: Request, res: Response): Promise<void> {
     try {
       const transactionId = Number(req.params.id);

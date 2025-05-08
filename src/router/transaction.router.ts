@@ -29,6 +29,15 @@ export class TransactionRouter {
       this.transactionController.create.bind(this.transactionController)
     );
 
+    this.router.get(
+      "/transactions/:id",
+      AuthenticationMiddleware.verifyToken,
+      AuthorizationMiddleware.allowRoles("CUSTOMER"),
+      this.transactionController.getTransactionById.bind(
+        this.transactionController
+      )
+    );
+
     this.router.post(
       "/transactions/:id/payment-proof",
       AuthenticationMiddleware.verifyToken,

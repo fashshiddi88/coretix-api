@@ -16,7 +16,7 @@ export async function sendMail(options: {
   html: string;
 }) {
   await transporter.sendMail({
-    from: '"Coretix" <noreply@coretix.com>',
+    from: "no-reply@coretix.dev",
     ...options,
   });
 }

@@ -132,6 +132,51 @@ export class TransactionService {
     return transaction;
   }
 
+  // Get transaksi sebelum upload bukti
+  public async getTransactionById({
+    transactionId,
+    userId,
+  }: {
+    transactionId: number;
+    userId: number;
+  }) {
+    const trx = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+      select: {
+        id: true,
+        eventId: true,
+        totalPrice: true,
+        status: true,
+        event: {
+          select: {
+            id: true,
+            title: true,
+            imageUrl: true, // jika ada field price, atau ubah sesuai field di event
+            // tambahkan field lain yang dibutuhkan
+          },
+        },
+      },
+    });
+
+    if (!trx) {
+      throw new Error("Transaction not found");
+    }
+
+    // Pastikan hanya pemilik transaksi yang bisa mengakses
+    const ownershipCheck = await prisma.transaction.findFirst({
+      where: {
+        id: transactionId,
+        userId,
+      },
+    });
+
+    if (!ownershipCheck) {
+      throw new Error("Unauthorized access to transaction");
+    }
+
+    return trx;
+  }
+
   public async uploadPaymentProof({
     transactionId,
     userId,
