@@ -3,6 +3,7 @@ import { TransactionStatus } from "@prisma/client";
 import { TransactionQuery } from "../models/interface";
 import { restoreResources } from "../lib/utils/transactionUtils";
 import { StatisticsQuery } from "../models/interface";
+import { sendMail } from "../lib/nodemailer.config";
 
 export class DashboardService {
   public async getBasicStatistics(query: StatisticsQuery) {
@@ -97,7 +98,7 @@ export class DashboardService {
   public async acceptTransaction(transactionId: number, organizerId: number) {
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
-      include: { event: true },
+      include: { event: true, user: true },
     });
 
     if (!transaction) throw new Error("Transaction not found");
@@ -109,10 +110,22 @@ export class DashboardService {
         "Only transactions waiting for confirmation can be accepted"
       );
 
-    return prisma.transaction.update({
+    const updated = await prisma.transaction.update({
       where: { id: transactionId },
       data: { status: "DONE", confirmedAt: new Date() },
     });
+
+    // Kirim email notifikasi
+    await sendMail({
+      to: transaction.user.email,
+      subject: "Pembayaran Anda Telah Dikonfirmasi",
+      html: `
+      <p>Halo ${transaction.user.name},</p>
+      <p>Pembayaran untuk event <strong>${transaction.event.title}</strong> telah <strong>dikonfirmasi</strong>.</p>
+      <p>Terima kasih telah menggunakan layanan kami.</p>
+    `,
+    });
+    return updated;
   }
 
   // Reject transaksi
@@ -121,6 +134,7 @@ export class DashboardService {
       where: { id: transactionId },
       include: {
         event: true,
+        user: true,
       },
     });
 
@@ -133,7 +147,7 @@ export class DashboardService {
         "Only transactions waiting for confirmation can be rejected"
       );
 
-    return await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx) => {
       // rollback resource
       await restoreResources(tx, transaction);
 
@@ -143,6 +157,18 @@ export class DashboardService {
         data: { status: "REJECTED", rejectedAt: new Date() },
       });
     });
+    // Kirim email notifikasi
+    await sendMail({
+      to: transaction.user.email,
+      subject: "Pembayaran Anda Ditolak",
+      html: `
+      <p>Halo ${transaction.user.name},</p>
+      <p>Maaf, pembayaran Anda untuk event <strong>${transaction.event.title}</strong> telah <strong>ditolak</strong> oleh penyelenggara.</p>
+      <p>Silakan hubungi penyelenggara untuk informasi lebih lanjut.</p>
+    `,
+    });
+
+    return updated;
   }
 
   // Attendess list
